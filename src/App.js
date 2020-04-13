@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { lazy, Suspense, useContext, useState, useEffect } from 'react'
+import { LinearProgress } from '@material-ui/core'
+import { Switch, Route, Redirect } from 'react-router-dom'
+import { AuthContext } from 'contexts/auth'
+import firebase from 'services/firebase'
+import t from 'prop-types'
+const MainPage = lazy(() => import('pages/main'))
+const Login = lazy(() => import('pages/login'))
+function App ({ location }) {
+  const { userInfor, setUserInfor, logout } = useContext(AuthContext)
+  const [didCheckUserIn, setDidCheckUserIn] = useState(false)
+  const { isUserLoggedIn } = userInfor
 
-function App() {
+  useEffect(() => {
+    firebase.auth().onAuthStateChanged((user) => {
+      console.log('dados do usuario: ', user)
+      setUserInfor({ isUserLoggedIn: !!user, user })
+      setDidCheckUserIn(true)
+    })
+  }, [])
+
+  if (!didCheckUserIn) {
+    return <LinearProgress />
+  }
+
+  if (isUserLoggedIn && location.pathname === '/login') {
+    return <Redirect to='/' />
+  }
+
+  if (!isUserLoggedIn && location.pathname !== '/login') {
+    return <Redirect to='/login' />
+  }
+
+  window.logout = logout
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Suspense fallback={<LinearProgress />}>
+      <Switch>
+        <Route path='/login' component={Login} />
+        <Route component={MainPage} />
+      </Switch>
+    </Suspense>
+
+  )
 }
 
-export default App;
+App.propTypes = {
+  location: t.object.isRequired
+}
+
+export default App
