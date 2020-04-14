@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
-const config = {
+const firebaseConfig = {
   apiKey: 'AIzaSyCye2U-U-qMnJIT33saNZieHwwOUKaR2C0',
   authDomain: 'reactzzaria-e1bd9.firebaseapp.com',
   databaseURL: 'https://reactzzaria-e1bd9.firebaseio.com',
@@ -12,6 +12,6 @@ const config = {
   measurementId: 'G-7HXBZ31SXV'
 }
 
-firebase.initializeApp(config)
+firebase.initializeApp(firebaseConfig)
 
 export default firebase
