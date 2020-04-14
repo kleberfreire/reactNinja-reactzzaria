@@ -1,22 +1,26 @@
 import { PureComponent } from 'react'
-import types from 'prop-types'
+import t from 'prop-types'
 
 class ErrorBoundary extends PureComponent {
   state = { hasError: false }
 
-  static getDerivedStateFromError () {
+  static propTypes = {
+    children: t.func.isRequired
+  }
+
+  static getDerivedStateFromError (error) {
+    console.log('error getDerivedStateFromError:', error.message)
     return { hasError: true }
   }
 
-  componentDidCatch () {}
+  componentDidCatch (error, info) {
+    console.log('error:', error)
+    console.log('info:', info.componentStack)
+  }
 
   render () {
     return this.props.children(this.state.hasError)
   }
-}
-
-ErrorBoundary.propTypes = {
-  children: types.func.isRequired
 }
 
 export default ErrorBoundary

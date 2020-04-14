@@ -1,22 +1,30 @@
-import React, { lazy, Suspense, useContext, useState, useEffect } from 'react'
-import { LinearProgress } from '@material-ui/core'
-import { Switch, Route, Redirect } from 'react-router-dom'
-import { AuthContext } from 'contexts/auth'
-import firebase from 'services/firebase'
+import React, { lazy, useEffect, useContext, useState, Suspense } from 'react'
 import t from 'prop-types'
+import { Redirect, Route, Switch } from 'react-router-dom'
+import { LinearProgress } from '@material-ui/core'
+import firebase from 'services/firebase'
+import { AuthContext } from 'contexts/auth'
+
 const MainPage = lazy(() => import('pages/main'))
 const Login = lazy(() => import('pages/login'))
+
 function App ({ location }) {
-  const { userInfor, setUserInfor, logout } = useContext(AuthContext)
+  const { userInfo, setUserInfo, logout } = useContext(AuthContext)
   const [didCheckUserIn, setDidCheckUserIn] = useState(false)
-  const { isUserLoggedIn } = userInfor
+
+  const { isUserLoggedIn } = userInfo
 
   useEffect(() => {
     firebase.auth().onAuthStateChanged((user) => {
-      console.log('dados do usuario: ', user)
-      setUserInfor({ isUserLoggedIn: !!user, user })
+      console.log('dados do usuário:', user)
+      setUserInfo({
+        isUserLoggedIn: !!user,
+        user
+      })
       setDidCheckUserIn(true)
     })
+
+    window.logout = logout
   }, [])
 
   if (!didCheckUserIn) {
@@ -31,8 +39,6 @@ function App ({ location }) {
     return <Redirect to='/login' />
   }
 
-  window.logout = logout
-
   return (
     <Suspense fallback={<LinearProgress />}>
       <Switch>
@@ -40,7 +46,6 @@ function App ({ location }) {
         <Route component={MainPage} />
       </Switch>
     </Suspense>
-
   )
 }
 
