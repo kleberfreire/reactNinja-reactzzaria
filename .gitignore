@@ -1,5 +1,5 @@
 #services
-firebase.js
+/services/firebase.js
 # dependencies
 /node_modules
 /.pnp
